@@ -46,7 +46,7 @@ wf = Workflow()
 detector = wf.add_task(name="infer_uniface_detection", auto_connect=True)
 
 # Run the workflow on image
-wf.run_on(url="https://raw.githubusercontent.com/Ikomia-hub/infer_uniface_detection/main/images/example.jpg")
+wf.run_on(url="https://github.com/yakhyo/uniface/blob/main/assets/scientists.png?raw=true")
 
 # Display result
 display(detector.get_image_with_graphics())
@@ -78,7 +78,7 @@ detector.set_parameters({
 })
 
 # Run the workflow on image
-wf.run_on(url="https://raw.githubusercontent.com/Ikomia-hub/infer_uniface_detection/main/images/example.jpg")
+wf.run_on(url="https://github.com/yakhyo/uniface/blob/main/assets/scientists.png?raw=true")
 
 # Display result
 display(detector.get_image_with_graphics())
@@ -105,7 +105,7 @@ wf = Workflow()
 detector = wf.add_task(name="infer_uniface_detection", auto_connect=True)
 
 # Run the workflow on image
-wf.run_on(url="https://raw.githubusercontent.com/Ikomia-hub/infer_uniface_detection/main/images/example.jpg")
+wf.run_on(url="https://github.com/yakhyo/uniface/blob/main/assets/scientists.png?raw=true")
 
 # Iterate over outputs
 for output in detector.get_outputs():
