@@ -56,6 +56,52 @@ class InferUnifaceDetectionWidget(core.CWorkflowTaskWidget):
             step=0.05
         )
 
+        # Output anonymized checkbox
+        self.check_anonymized = pyqtutils.append_check(
+            self.grid_layout,
+            "Output anonymized image",
+            self.parameters.output_anonymized
+        )
+
+        # Blur method selection
+        self.combo_blur_method = pyqtutils.append_combo(self.grid_layout, "Blur method")
+        self.combo_blur_method.addItem("gaussian")
+        self.combo_blur_method.addItem("pixelate")
+        self.combo_blur_method.addItem("blackout")
+        self.combo_blur_method.addItem("elliptical")
+        self.combo_blur_method.addItem("median")
+        self.combo_blur_method.setCurrentText(self.parameters.blur_method)
+
+        # Blur strength (for gaussian, elliptical, median)
+        self.spin_blur_strength = pyqtutils.append_double_spin(
+            self.grid_layout,
+            "Blur strength",
+            self.parameters.blur_strength,
+            min=1.0,
+            max=10.0,
+            step=0.5
+        )
+
+        # Pixel blocks (for pixelate)
+        self.spin_pixel_blocks = pyqtutils.append_spin(
+            self.grid_layout,
+            "Pixel blocks",
+            self.parameters.pixel_blocks,
+            min=1,
+            max=50,
+            step=1
+        )
+
+        # Margin
+        self.spin_margin = pyqtutils.append_spin(
+            self.grid_layout,
+            "Margin",
+            self.parameters.margin,
+            min=0,
+            max=100,
+            step=5
+        )
+
         # Set widget layout
         self.set_layout(layout_ptr)
 
@@ -65,6 +111,14 @@ class InferUnifaceDetectionWidget(core.CWorkflowTaskWidget):
         self.parameters.model_name = self.combo_model.currentText()
         self.parameters.conf_thres = self.spin_conf_thres.value()
         self.parameters.nms_thres = self.spin_nms_thres.value()
+        
+        # Anonymization parameters
+        self.parameters.output_anonymized = self.check_anonymized.isChecked()
+        self.parameters.blur_method = self.combo_blur_method.currentText()
+        self.parameters.blur_strength = self.spin_blur_strength.value()
+        self.parameters.pixel_blocks = self.spin_pixel_blocks.value()
+        self.parameters.margin = self.spin_margin.value()
+        
         self.parameters.update = True
 
         # Send signal to launch the algorithm main function

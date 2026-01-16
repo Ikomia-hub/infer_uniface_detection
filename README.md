@@ -21,6 +21,8 @@
 
 Run inference for multi-face detection using UniFace library. UniFace is a lightweight production-ready face analysis library built on ONNX Runtime, supporting multiple face detection models including RetinaFace, YOLOv5Face, SCRFD, and YOLOv8Face.
 
+This algorithm also includes optional face anonymization capabilities with 5 different blur methods (gaussian, pixelate, blackout, elliptical, median) for privacy protection.
+
 ![Example image](https://raw.githubusercontent.com/Ikomia-hub/infer_uniface_detection/main/images/output.jpg)
 
 ## :rocket: Use with Ikomia API
@@ -75,6 +77,11 @@ detector.set_parameters({
     "model_name": "retinaface",
     "conf_thres": "0.6",
     "nms_thres": "0.4",
+    "output_anonymized": "Ture",
+    "blur_method": "pixelate",
+    "blur_strength": "3.0",
+    "pixel_blocks": "15",
+    "margin": "20"
 })
 
 # Run the workflow on image
@@ -84,9 +91,17 @@ wf.run_on(url="https://github.com/yakhyo/uniface/blob/main/assets/scientists.png
 display(detector.get_image_with_graphics())
 ```
 
+**Detection Parameters:**
 - **model_name** (str, default="retinaface"): Face detection model to use. Options: "retinaface", "yolov5face", "scrfd", "yolov8face".
 - **conf_thres** (float, default="0.6"): Object detection confidence threshold.
 - **nms_thres** (float, default="0.4"): Non-maximum suppression threshold.
+
+**Anonymization Parameters:**
+- **output_anonymized** (bool, default="False"): Enable output of anonymized image with blurred faces.
+- **blur_method** (str, default="pixelate"): Blur method to use. Options: "gaussian", "pixelate", "blackout", "elliptical", "median".
+- **blur_strength** (float, default="3.0"): Blur intensity for gaussian, elliptical, and median methods (range: 1.0-10.0).
+- **pixel_blocks** (int, default="15"): Size of pixelation blocks for pixelate method (range: 1-50).
+- **margin** (int, default="20"): Extra margin around face regions in pixels (range: 0-100).
 
 ***Note***: parameter key and value should be in **string format** when added to the dictionary.
 
@@ -113,5 +128,39 @@ for output in detector.get_outputs():
     print(output)
     # Export it to JSON
     output.to_json()
+```
+
+The algorithm outputs:
+- **Output 0**: Original image with detection overlays (graphics)
+- **Output 1**: Detection graphics (bounding boxes)
+- **Output 2**: Anonymized image (only when `output_anonymized=True`)
+
+## :wrench: Face Anonymization Example
+
+```python
+from ikomia.dataprocess.workflow import Workflow
+from ikomia.utils.displayIO import display
+
+# Init your workflow
+wf = Workflow()
+
+# Add face detection with anonymization
+detector = wf.add_task(name="infer_uniface_detection", auto_connect=True)
+
+# Enable anonymization with pixelate method
+detector.set_parameters({
+    "model_name": "retinaface",
+    "conf_thres": "0.6",
+    "output_anonymized": "True",
+    "blur_method": "pixelate",
+    "pixel_blocks": "15"
+})
+
+# Run the workflow on image
+wf.run_on(url="https://github.com/yakhyo/uniface/blob/main/assets/scientists.png?raw=true")
+
+# Display anonymized image
+anonymized_img = detector.get_output(2)
+display(anonymized_img.get_image())
 ```
 

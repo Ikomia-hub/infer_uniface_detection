@@ -2,11 +2,12 @@
 Module that implements the core logic of algorithm execution.
 """
 import copy
+import numpy as np
 from ikomia import core, dataprocess
 
 import uniface
 import os
-from uniface.visualization import draw_detections
+from uniface.privacy import BlurFace
 from .models.model_loader import create_detector
 
 
@@ -23,6 +24,15 @@ class InferUnifaceDetectionParam(core.CWorkflowTaskParam):
         self.model_name = "retinaface"
         self.conf_thres = 0.6
         self.nms_thres = 0.4
+
+        # Anonymization parameters
+        self.output_anonymized = False
+        # Available methods: 'gaussian', 'pixelate', 'blackout', 'elliptical', 'median'
+        self.blur_method = "pixelate"
+        self.blur_strength = 3.0
+        self.pixel_blocks = 15
+        self.margin = 20
+
         self.update = False
 
     def set_values(self, params):
@@ -30,6 +40,15 @@ class InferUnifaceDetectionParam(core.CWorkflowTaskParam):
         self.model_name = params.get("model_name", "retinaface")
         self.conf_thres = float(params["conf_thres"])
         self.nms_thres = float(params["nms_thres"])
+
+        # Anonymization parameters
+        self.output_anonymized = params.get(
+            "output_anonymized", "False") == "True"
+        self.blur_method = params.get("blur_method", "pixelate")
+        self.blur_strength = float(params.get("blur_strength", 3.0))
+        self.pixel_blocks = int(params.get("pixel_blocks", 15))
+        self.margin = int(params.get("margin", 20))
+
         self.update = True
 
     def get_values(self):
@@ -38,7 +57,14 @@ class InferUnifaceDetectionParam(core.CWorkflowTaskParam):
         params = {
             "model_name": str(self.model_name),
             "conf_thres": str(self.conf_thres),
-            "nms_thres": str(self.nms_thres)
+            "nms_thres": str(self.nms_thres),
+
+            # Anonymization parameters
+            "output_anonymized": str(self.output_anonymized),
+            "blur_method": str(self.blur_method),
+            "blur_strength": str(self.blur_strength),
+            "pixel_blocks": str(self.pixel_blocks),
+            "margin": str(self.margin)
         }
         return params
 
@@ -67,6 +93,9 @@ class InferUnifaceDetection(dataprocess.CObjectDetectionTask):
         # Example :  self.add_input(dataprocess.CImageIO())
         #           self.add_output(dataprocess.CImageIO())
 
+        # Add image output for visualization
+        self.add_output(dataprocess.CImageIO())
+
         # Create parameters object
         if param is None:
             self.set_param_object(InferUnifaceDetectionParam())
@@ -77,6 +106,7 @@ class InferUnifaceDetection(dataprocess.CObjectDetectionTask):
         self.model_folder = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "weights")
         self.detector = None
+        self.blurrer = None
 
     def _load_model(self):
         """Load the detector model using the refactored model loader."""
@@ -141,6 +171,23 @@ class InferUnifaceDetection(dataprocess.CObjectDetectionTask):
             # Add object: (object_id, class_id, confidence, x, y, width, height)
             self.add_object(i+1, 0, float(confidence),
                             float(x1), float(y1), w, h)
+
+        # Create anonymized output with blurred faces (if enabled)
+        if param.output_anonymized:
+            # Initialize or update blurrer if needed
+            if self.blurrer is None or param.update:
+                self.blurrer = BlurFace(
+                    method=param.blur_method,
+                    blur_strength=param.blur_strength,
+                    pixel_blocks=param.pixel_blocks,
+                    margin=param.margin
+                )
+
+            # Apply anonymization
+            anonymized_image = self.blurrer.anonymize(src_image.copy(), faces)
+            img = np.array(anonymized_image)
+            output = self.get_output(2)
+            output.set_image(img)
 
         # Step progress bar (Ikomia Studio):
         self.emit_step_progress()
