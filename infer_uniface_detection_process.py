@@ -1,13 +1,14 @@
 """
 Module that implements the core logic of algorithm execution.
 """
+import os
 import copy
 import numpy as np
+
 from ikomia import core, dataprocess
 
-import uniface
-import os
 from uniface.privacy import BlurFace
+
 from .models.model_loader import create_detector
 
 
@@ -16,7 +17,6 @@ class InferUnifaceDetectionParam(core.CWorkflowTaskParam):
     Class to handle the algorithm parameters.
     Inherits PyCore.CWorkflowTaskParam from Ikomia API.
     """
-
     def __init__(self):
         core.CWorkflowTaskParam.__init__(self)
         # Place default value initialization here
@@ -58,7 +58,6 @@ class InferUnifaceDetectionParam(core.CWorkflowTaskParam):
             "model_name": str(self.model_name),
             "conf_thres": str(self.conf_thres),
             "nms_thres": str(self.nms_thres),
-
             # Anonymization parameters
             "output_anonymized": str(self.output_anonymized),
             "blur_method": str(self.blur_method),
@@ -89,9 +88,6 @@ class InferUnifaceDetection(dataprocess.CObjectDetectionTask):
 
     def __init__(self, name, param):
         dataprocess.CObjectDetectionTask.__init__(self, name)
-        # Add input/output of the algorithm here
-        # Example :  self.add_input(dataprocess.CImageIO())
-        #           self.add_output(dataprocess.CImageIO())
 
         # Add image output for visualization
         self.add_output(dataprocess.CImageIO())
@@ -218,7 +214,7 @@ class InferUnifaceDetectionFactory(dataprocess.CTaskFactory):
         self.info.license = "MIT License"
 
         # Ikomia API compatibility
-        self.info.min_ikomia_version = "0.15.0"
+        self.info.min_ikomia_version = "0.16.0"
 
         # URL of documentation
         self.info.documentation_link = "https://yakhyo.github.io/uniface/"

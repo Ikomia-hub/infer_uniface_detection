@@ -1,12 +1,13 @@
 """
 Module that implements the UI widget of the algorithm.
 """
+# PyQt GUI framework
+from PyQt6.QtWidgets import *
+
 from ikomia import core, dataprocess
 from ikomia.utils import pyqtutils, qtconversion
-from infer_uniface_detection.infer_uniface_detection_process import InferUnifaceDetectionParam
 
-# PyQt GUI framework
-from PyQt5.QtWidgets import *
+from infer_uniface_detection.infer_uniface_detection_process import InferUnifaceDetectionParam
 
 
 class InferUnifaceDetectionWidget(core.CWorkflowTaskWidget):
