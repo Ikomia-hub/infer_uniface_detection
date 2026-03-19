@@ -48,7 +48,7 @@ wf = Workflow()
 detector = wf.add_task(name="infer_uniface_detection", auto_connect=True)
 
 # Run the workflow on image
-wf.run_on(url="https://github.com/yakhyo/uniface/blob/main/assets/scientists.png?raw=true")
+wf.run_on(url="https://raw.githubusercontent.com/yakhyo/uniface/refs/heads/main/assets/scientists.png")
 
 # Display result
 display(detector.get_image_with_graphics())
@@ -85,7 +85,7 @@ detector.set_parameters({
 })
 
 # Run the workflow on image
-wf.run_on(url="https://github.com/yakhyo/uniface/blob/main/assets/scientists.png?raw=true")
+wf.run_on(url="https://raw.githubusercontent.com/yakhyo/uniface/refs/heads/main/assets/scientists.png")
 
 # Display result
 display(detector.get_image_with_graphics())
@@ -120,7 +120,7 @@ wf = Workflow()
 detector = wf.add_task(name="infer_uniface_detection", auto_connect=True)
 
 # Run the workflow on image
-wf.run_on(url="https://github.com/yakhyo/uniface/blob/main/assets/scientists.png?raw=true")
+wf.run_on(url="https://raw.githubusercontent.com/yakhyo/uniface/refs/heads/main/assets/scientists.png")
 
 # Iterate over outputs
 for output in detector.get_outputs():
@@ -157,7 +157,7 @@ detector.set_parameters({
 })
 
 # Run the workflow on image
-wf.run_on(url="https://github.com/yakhyo/uniface/blob/main/assets/scientists.png?raw=true")
+wf.run_on(url="https://raw.githubusercontent.com/yakhyo/uniface/refs/heads/main/assets/scientists.png")
 
 # Display anonymized image
 anonymized_img = detector.get_output(2)
